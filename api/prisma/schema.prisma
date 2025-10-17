@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model algorithms {
+  id                                     Int                 @id @default(autoincrement())
+  name                                   String              @unique(map: "IDX_f9f1cf41254112adec19b07256") @db.VarChar(100)
+  category                               algorithms_category @default(Other)
+  complexity                             String              @db.VarChar(50)
+  description                            String              @db.Text
+  pseudocode                             String?             @db.Text
+  code                                   String?             @db.Text
+  structureSchema                        String?             @db.LongText
+  validationRules                        String?             @db.LongText
+  isPublished                            Int                 @default(1) @db.TinyInt
+  created_at                             DateTime            @default(now()) @db.DateTime(6)
+  updated_at                             DateTime            @default(now()) @db.DateTime(6)
+  createdById                            Int?
+  lastEditedById                         Int?
+  users_algorithms_createdByIdTousers    users?              @relation("algorithms_createdByIdTousers", fields: [createdById], references: [id], onUpdate: NoAction, map: "FK_2d314e91b4f516b8bd6e48dd292")
+  users_algorithms_lastEditedByIdTousers users?              @relation("algorithms_lastEditedByIdTousers", fields: [lastEditedById], references: [id], onUpdate: NoAction, map: "FK_e1f90fe38ae4345c4dd185c43c5")
+  exercises                              exercises[]
+  visualizations                         visualizations[]
+
+  @@index([createdById], map: "FK_2d314e91b4f516b8bd6e48dd292")
+  @@index([lastEditedById], map: "FK_e1f90fe38ae4345c4dd185c43c5")
+}
+
+model exercises {
+  id          Int         @id @default(autoincrement())
+  description String?     @db.Text
+  created_at  DateTime    @default(now()) @db.DateTime(6)
+  algorithmId Int?
+  createdById Int?
+  algorithms  algorithms? @relation(fields: [algorithmId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_6e2079fa607aa37b4ba6d8d64e4")
+  users       users?      @relation(fields: [createdById], references: [id], onUpdate: NoAction, map: "FK_9f847dfd076ba00bb1f22d454f3")
+
+  @@index([algorithmId], map: "FK_6e2079fa607aa37b4ba6d8d64e4")
+  @@index([createdById], map: "FK_9f847dfd076ba00bb1f22d454f3")
+}
+
+model submissions {
+  id         Int      @id @default(autoincrement())
+  content    String?  @db.Text
+  created_at DateTime @default(now()) @db.DateTime(6)
+  userId     Int?
+  users      users?   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_eae888413ab8fc63cc48759d46a")
+
+  @@index([userId], map: "FK_eae888413ab8fc63cc48759d46a")
+}
+
+model users {
+  id                                          Int              @id @default(autoincrement())
+  firstName                                   String           @db.VarChar(50)
+  lastName                                    String           @db.VarChar(50)
+  username                                    String           @unique(map: "IDX_fe0bb3f6520ee0469504521e71") @db.VarChar(50)
+  email                                       String           @unique(map: "IDX_97672ac88f789774dd47f7c8be") @db.VarChar(100)
+  password                                    String           @db.VarChar(255)
+  isActive                                    Int              @default(1) @db.TinyInt
+  created_at                                  DateTime         @default(now()) @db.Timestamp(6)
+  updated_at                                  DateTime         @default(now()) @db.Timestamp(6)
+  algorithms_algorithms_createdByIdTousers    algorithms[]     @relation("algorithms_createdByIdTousers")
+  algorithms_algorithms_lastEditedByIdTousers algorithms[]     @relation("algorithms_lastEditedByIdTousers")
+  exercises                                   exercises[]
+  submissions                                 submissions[]
+  visualizations                              visualizations[]
+}
+
+model visualizations {
+  id            Int         @id @default(autoincrement())
+  title         String      @db.VarChar(255)
+  description   String?     @db.VarChar(255)
+  structureType String      @db.VarChar(255)
+  stateJson     String?     @db.LongText
+  stepCount     Int         @default(0)
+  createdAt     DateTime    @default(now()) @db.DateTime(6)
+  updatedAt     DateTime    @default(now()) @db.DateTime(6)
+  algorithmId   Int?
+  userId        Int?
+  users         users?      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_490f3232a2415b7f9d6da4ed93a")
+  algorithms    algorithms? @relation(fields: [algorithmId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_b14d596460a51da82210869da87")
+
+  @@index([userId], map: "FK_490f3232a2415b7f9d6da4ed93a")
+  @@index([algorithmId], map: "FK_b14d596460a51da82210869da87")
+}
+
+enum algorithms_category {
+  Sorting
+  Searching
+  Graph
+  Tree
+  Dynamic
+  Greedy
+  Other
+}
