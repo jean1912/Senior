@@ -6,7 +6,7 @@ import { ChatgptModule } from './gptEnhance/chatgpt.module';
 import { UserModule } from './user/user.module'
 import {AlgorithmsModule} from './algorithms/algorithms.module';  
 import { VisualizationModule } from './visualizations/visualization.module';
-import { VisualizationSeederModule } from './visualizations/visualization-seeder.module';
+
 
 
 
@@ -34,7 +34,7 @@ import { VisualizationSeederModule } from './visualizations/visualization-seeder
     UserModule,
     AlgorithmsModule,
     VisualizationModule,
-   VisualizationSeederModule,
+   
     
   ],
 })
