@@ -1,0 +1,56 @@
+.array-view-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 0;
+}
+
+.array-title {
+  color: #e2e8f0;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.array-index-row,
+.array-row {
+  display: flex;
+  gap: 4px;
+}
+
+.array-index {
+  width: 40px;
+  text-align: center;
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+/* Value cells */
+.array-cell {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #475569;
+  background: #1e293b;
+  color: #f8fafc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: 0.25s all;
+}
+
+/* Single highlighted index */
+.array-cell.highlight {
+  background: #facc15;
+  color: #1e293b;
+  border-color: #facc15;
+  box-shadow: 0 0 10px #facc15aa;
+}
+
+/* Range highlight (for sliding window, max subarray, etc.) */
+.array-cell.range {
+  background: #38bdf8;
+  color: #0f172a;
+  border-color: #38bdf8;
+}

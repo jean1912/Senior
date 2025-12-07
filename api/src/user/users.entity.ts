@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Visualization } from '../visualizations/visualization.entity';
 import { Submission } from '../submissions/submission.entity';
+import { Exercise } from '../exercises/exercise.entity';
 
 @Entity('users')
 export class Users {
@@ -44,4 +45,6 @@ export class Users {
 
   @OneToMany(() => Submission, (s) => s.user, { cascade: true })
   submissions: Submission[];
+  @OneToMany(() => Exercise, (e) => e.creator, { cascade: true })
+exercises: Exercise[];
 }

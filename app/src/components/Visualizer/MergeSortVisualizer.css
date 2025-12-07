@@ -1,0 +1,72 @@
+.merge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* move up */
+  gap: 18px; /* tighter spacing between rows */
+  padding: 10px 0 0 0; /* reduced top padding */
+  background: #9fb0d7;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(15, 23, 42, 0.5);
+  height: 420px; /* control height */
+  margin-top: -30px; /* push visual upward */
+}
+
+.merge-title {
+  color: #e2e8f0;
+  font-weight: 600;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.merge-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.merge-cell {
+  width: 46px;
+  height: 46px;
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #1e293b;
+  border-radius: 5px;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 🟨 Initial unsorted array */
+.merge-cell.initial {
+  background: #facc15;
+  color: #111827;
+}
+
+/* 🟦 Left side */
+.merge-cell.left {
+  background: #3b82f6;
+}
+
+/* 🟨 Right side */
+.merge-cell.right {
+  background: #fbbf24;
+}
+
+/* 🟩 Merged array */
+.merge-cell.merged {
+  background: #22c55e;
+}
+
+.merge-row.top-array {
+  margin-bottom: 12px;
+}
+
+.merge-cell:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}

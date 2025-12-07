@@ -8,6 +8,8 @@ import feature3 from "../assets/back.jpg";
 import feature4 from "../assets/back.jpg";
 import DemoVisualizer from "../components/DemoVisualizer";
 import NavBarHome from "../components/NavBarHome";
+import { Link } from "react-router-dom"; // <-- add this at top
+
 
 
 
@@ -89,7 +91,9 @@ function Home() {
               >
                 Try Live Demo
               </button>
-              <a className="btn btn-outline-light btn-lg" href="/exercises">Explore Exercises</a>
+                        <Link className="btn btn-outline-light btn-lg" to="/exercises">
+              Explore Exercises
+            </Link>
             </div>
 
             <div className="mt-4 small-muted">
@@ -106,24 +110,46 @@ function Home() {
             <h2 className="mb-4 text-center">What you can do</h2>
             <div className="row gy-4">
               {[
-                { emoji: "⚙️", title: "Instrumented Algorithms", desc: "Step tracing, comparisons, swaps, and runtime metrics for each run." },
-                { emoji: "🌳", title: "Manipulate Data Structures", desc: "Insert/delete/search on trees, lists, stacks, queues and graphs — watch changes live." },
-                { emoji: "🧪", title: "Exercises & Judging", desc: "Auto-graded exercises with persistence and feedback for students." },
-                { emoji: "🤖", title: "ML Helper", desc: "Lightweight classifier suggests likely algorithm/problem types from a description." },
-              ].map((f, i) => (
-                <div key={i} className="col-md-3">
-                  <div className="card h-100 visual-card shadow-sm">
-                    <div className="card-body d-flex flex-column">
-                      <div className="feature-emoji">{f.emoji}</div>
-                      <h5 className="card-title">{f.title}</h5>
-                      <p className="card-text small-muted">{f.desc}</p>
-                      <div className="mt-auto">
-                        <a className="btn btn-sm btn-outline-primary" href="/docs#features">Learn more</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+  {
+    emoji: "⚙️",
+    title: "understand algorithms better",
+    desc: "understand algorithms better in the intuative algorithm visualizer.",
+    link: "/visualizer"
+  },
+  {
+    emoji: "🌳",
+    title: "create your own algorithm",
+    desc: "create your own algorithm and watch it at work in the dynamic algorithm creater",
+    link: "/builder"
+  },
+  {
+    emoji: "🧪",
+    title: "Exercises & Judging",
+    desc: "Auto-graded exercises with persistence and feedback for students.",
+    link: "/exercises"
+  },
+  {
+    emoji: "🤖",
+    title: "AI Helper",
+    desc: "Lightweight classifier helps with algorithm/problem types from a description.",
+    link: "/ai-chat"
+  }
+].map((f, i) => (
+  <div key={i} className="col-md-3">
+    <div className="card h-100 visual-card shadow-sm">
+      <div className="card-body d-flex flex-column">
+        <div className="feature-emoji">{f.emoji}</div>
+        <h5 className="card-title">{f.title}</h5>
+        <p className="card-text small-muted">{f.desc}</p>
+        <div className="mt-auto">
+          <Link className="btn btn-sm btn-outline-primary" to={f.link}>
+  Go →
+</Link>
+        </div>
+      </div>
+    </div>
+  </div>
+))}
             </div>
           </div>
         </section>
@@ -188,7 +214,7 @@ function Home() {
 
       </main>
 
-      <footer className="footer text-center"style={{ backgroundColor: "#eb9800ff", padding: "1rem" }}>
+      <footer className="footer text-center"style={{ backgroundColor: "#6bffc4ff", padding: "1rem" }}>
         <div className="container">
           <div className="mb-2">
             <a href="/about" className="me-3">About</a>

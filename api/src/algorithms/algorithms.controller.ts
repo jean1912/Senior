@@ -19,7 +19,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class AlgorithmsController {
   constructor(private readonly algorithmsService: AlgorithmsService) {}
 
-  // Public endpoints
+  
   @Get()
   findAll() {
     return this.algorithmsService.findAll();
@@ -30,7 +30,7 @@ export class AlgorithmsController {
     return this.algorithmsService.findOne(id);
   }
 
-  // Protected routes
+  
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() dto: CreateAlgorithmDto, @Req() req) {

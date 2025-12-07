@@ -29,3 +29,11 @@ export const generateVisualization = async (algorithmId, input) => {
   );
   return res.data; // { id, stateJson: { steps, result }, ... }
 };
+// 🧠 Fetch all algorithms instead of visualizations
+export const getAllAlgorithms = async () => {
+  const token = getTokenBearer();
+  const res = await http.get("/algorithms", {
+    headers: { Authorization: token },
+  });
+  return res.data;
+};

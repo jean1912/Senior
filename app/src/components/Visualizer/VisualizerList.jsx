@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { getAllVisualizations } from "../../services/VisualizerService";
-import { Container, Card, Button, Spinner } from "react-bootstrap";
+import { Spinner } from "react-bootstrap";
+import { getAllAlgorithms } from "../../services/VisualizerService";
 import VisualizerCanvas from "./VisualizerCanvas";
+import "./VisualizerList.css";
+
+const CATEGORIES = ["Sorting", "Searching", "Graph", "Tree", "Dynamic", "Greedy", "Other"];
 
 const VisualizerList = () => {
-  const [visualizations, setVisualizations] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [algorithms, setAlgorithms] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getAllVisualizations();
-        setVisualizations(data);
+        const data = await getAllAlgorithms();
+        setAlgorithms(data);
       } catch (err) {
-        console.error("❌ Failed to fetch visualizations:", err);
+        console.error("❌ Failed to fetch algorithms:", err);
       } finally {
         setLoading(false);
       }
@@ -24,45 +28,98 @@ const VisualizerList = () => {
 
   if (loading)
     return (
-      <Container className="text-center mt-5">
-        <Spinner animation="border" /> Loading visualizations...
-      </Container>
+      <div className="visualizer-loading text-center mt-5">
+        <Spinner animation="border" /> Loading algorithms...
+      </div>
     );
 
-  return (
-    <Container className="my-5">
-      <h2 className="text-center mb-4">Algorithm Visualizations</h2>
+  // group algorithms by category
+  const grouped = CATEGORIES.reduce((acc, cat) => {
+    acc[cat] = algorithms.filter(
+      (algo) => algo.category?.toLowerCase() === cat.toLowerCase()
+    );
+    return acc;
+  }, {});
 
-      {selected ? (
-        <VisualizerCanvas
-          visualization={selected}
-          onBack={() => setSelected(null)}
-        />
-      ) : (
-        <div className="d-flex flex-wrap justify-content-center gap-4">
-          {visualizations.map((vis) => (
-            <Card
-              key={vis.id}
-              style={{ width: "18rem" }}
-              className="shadow-sm text-center"
-            >
-              <Card.Body>
-                <Card.Title>{vis.title}</Card.Title>
-                <Card.Subtitle className="mb-2 text-muted">
-                  {vis.algorithm?.name || "Unknown Algorithm"}
-                </Card.Subtitle>
-                <Card.Text style={{ minHeight: "4rem" }}>
-                  {vis.description}
-                </Card.Text>
-                <Button variant="primary" onClick={() => setSelected(vis)}>
-                  Visualize
-                </Button>
-              </Card.Body>
-            </Card>
+  return (
+    <div className="visualizer-layout">
+      {/* 🧭 Sidebar */}
+      <div className="visualizer-sidebar">
+        <h4 className="sidebar-title">Algorithms</h4>
+
+        <ul className="category-list">
+          {CATEGORIES.map((cat) => (
+            <li key={cat} className="category-item">
+              <button
+                className={`category-btn ${
+                  selectedCategory === cat ? "active" : ""
+                }`}
+                onClick={() =>
+                  setSelectedCategory(selectedCategory === cat ? null : cat)
+                }
+              >
+                {cat}
+              </button>
+
+              {/* Show algorithms for selected category */}
+              {selectedCategory === cat && grouped[cat]?.length > 0 && (
+                <ul className="algorithm-sublist">
+                  {grouped[cat].map((algo) => (
+                    <li
+                      key={algo.id}
+                      className={`algorithm-item ${
+                        selectedAlgorithm?.id === algo.id ? "active" : ""
+                      }`}
+                      onClick={() => setSelectedAlgorithm(algo)}
+                    >
+                      <span className="algo-name">{algo.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {selectedCategory === cat && grouped[cat]?.length === 0 && (
+                <p className="no-algo">No algorithms in this category</p>
+              )}
+            </li>
           ))}
-        </div>
-      )}
-    </Container>
+        </ul>
+      </div>
+
+      {/* 🎨 Visualization Stage */}
+      <div className="visualizer-stage">
+        {selectedAlgorithm ? (
+          <VisualizerCanvas
+            visualization={{
+              title: selectedAlgorithm.name,
+              description: selectedAlgorithm.description,
+
+              // ⭐ Set structure automatically
+              structureType: selectedAlgorithm.category?.toLowerCase().includes("graph")
+                ? "Graph"
+                : selectedAlgorithm.category?.toLowerCase().includes("tree")
+                ? "Tree"
+                : "Array", // sorting, searching, others → arrays
+
+              algorithm: {
+                id: selectedAlgorithm.id,
+                name: selectedAlgorithm.name,
+                category: selectedAlgorithm.category,
+                complexity: selectedAlgorithm.complexity,
+                description: selectedAlgorithm.description,
+                pseudocode: selectedAlgorithm.pseudocode,
+                code: selectedAlgorithm.code,
+              },
+            }}
+            onBack={() => setSelectedAlgorithm(null)}
+          />
+        ) : (
+          <p className="text-center mt-5">
+            Select a category, then choose an algorithm to visualize.
+          </p>
+        )}
+      </div>
+    </div>
   );
 };
 

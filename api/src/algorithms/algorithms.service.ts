@@ -11,20 +11,30 @@ export class AlgorithmsService {
   constructor(
     @InjectRepository(Algorithm)
     private readonly algorithmsRepository: Repository<Algorithm>,
+
+    @InjectRepository(Users)
+    private readonly usersRepository: Repository<Users>,
   ) {}
 
-  async create(dto: CreateAlgorithmDto, user?: Users): Promise<Algorithm> {
+  // 🧩 Create algorithm and link to logged-in user
+  async create(dto: CreateAlgorithmDto, user?: any): Promise<Algorithm> {
     const existing = await this.algorithmsRepository.findOne({ where: { name: dto.name } });
     if (existing) throw new BadRequestException('Algorithm already exists');
 
+    let fullUser: Users | undefined = undefined;
+    if (user?.userId) {
+      fullUser = await this.usersRepository.findOne({ where: { id: user.userId } }) || undefined;
+    }
+
     const algorithm = this.algorithmsRepository.create({
       ...dto,
-      createdBy: user,
+      createdBy: fullUser, // ✅ use undefined instead of null
     });
 
-    return this.algorithmsRepository.save(algorithm);
+    return await this.algorithmsRepository.save(algorithm);
   }
 
+  // 🧩 Get all algorithms (with creator info)
   async findAll(): Promise<Algorithm[]> {
     return this.algorithmsRepository.find({
       relations: ['createdBy', 'lastEditedBy'],
@@ -32,6 +42,7 @@ export class AlgorithmsService {
     });
   }
 
+  // 🧩 Get one by ID
   async findOne(id: number): Promise<Algorithm> {
     const algo = await this.algorithmsRepository.findOne({
       where: { id },
@@ -41,7 +52,8 @@ export class AlgorithmsService {
     return algo;
   }
 
-  async update(id: number, dto: UpdateAlgorithmDto, user?: Users): Promise<Algorithm> {
+  // 🧩 Update
+  async update(id: number, dto: UpdateAlgorithmDto, user?: any): Promise<Algorithm> {
     const algo = await this.findOne(id);
 
     if (dto.name && dto.name !== algo.name) {
@@ -49,11 +61,17 @@ export class AlgorithmsService {
       if (nameTaken) throw new BadRequestException('Another algorithm with this name exists');
     }
 
+    let fullUser: Users | undefined = undefined;
+    if (user?.userId) {
+      fullUser = await this.usersRepository.findOne({ where: { id: user.userId } }) || undefined;
+    }
+
     Object.assign(algo, dto);
-    algo.lastEditedBy = user;
+    algo.lastEditedBy = fullUser;
     return this.algorithmsRepository.save(algo);
   }
 
+  // 🧩 Delete
   async remove(id: number): Promise<void> {
     const result = await this.algorithmsRepository.delete(id);
     if (result.affected === 0)

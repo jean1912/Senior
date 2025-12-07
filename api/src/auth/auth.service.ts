@@ -18,15 +18,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  /**
-   * Validate a user during login.
-   * Returns the user (without password) if credentials match.
-   */
-  async validateUser(
-    username: string,
-    password: string,
-  ): Promise<Omit<Users, 'password'> | null> {
-    // 🧩 Select only necessary fields for validation
+  async validateUser(username: string, password: string) {
     const user = await this.usersRepository.findOne({
       where: { username },
       select: [
@@ -39,57 +31,39 @@ export class AuthService {
         'isActive',
       ],
     });
-
     if (!user) return null;
 
-    // 🧩 Compare hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) return null;
 
-    // 🧩 Remove password before returning
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
-  /**
-   * Handle user login
-   * Returns JWT + sanitized user data
-   */
-  async login(
-    username: string,
-    password: string,
-  ): Promise<{ access_token: string; user: Omit<Users, 'password'> }> {
+  async login(username: string, password: string) {
     const user = await this.validateUser(username, password);
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const payload = { sub: user.id, username: user.username };
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
+
     const access_token = this.jwtService.sign(payload);
-
     return { access_token, user };
   }
 
-  /**
-   * Handle new user registration (signup)
-   * Returns JWT + sanitized user data
-   */
-  async signUp(
-    signUpDto: SignUpDto,
-  ): Promise<{ access_token: string; user: Omit<Users, 'password'> }> {
+  async signUp(signUpDto: SignUpDto) {
     const { firstName, lastName, username, email, password } = signUpDto;
-
-    // 🧩 Check for existing user with same username or email
     const existingUser = await this.usersRepository.findOne({
       where: [{ username }, { email }],
     });
-    if (existingUser) {
-      throw new BadRequestException('Username or email already exists');
-    }
+    if (existingUser) throw new BadRequestException('Username or email already exists');
 
-    // 🧩 Hash password before saving
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = this.usersRepository.create({
       firstName,
       lastName,
@@ -102,10 +76,15 @@ export class AuthService {
     const savedUser = await this.usersRepository.save(newUser);
     const { password: _, ...userWithoutPassword } = savedUser;
 
-    // 🧩 Generate JWT token
-    const payload = { sub: savedUser.id, username: savedUser.username };
-    const access_token = this.jwtService.sign(payload);
+    const payload = {
+      sub: savedUser.id,
+      username: savedUser.username,
+      email: savedUser.email,
+      firstName: savedUser.firstName,
+      lastName: savedUser.lastName,
+    };
 
+    const access_token = this.jwtService.sign(payload);
     return { access_token, user: userWithoutPassword };
   }
 }

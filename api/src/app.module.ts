@@ -1,22 +1,39 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+
+// 🔐 Core modules
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+
+// 🤖 ChatGPT Enhance
 import { ChatgptModule } from './gptEnhance/chatgpt.module';
-import { UserModule } from './user/user.module'
-import {AlgorithmsModule} from './algorithms/algorithms.module';  
+import { AiConvoModule } from './ai/ai-convo.module';
+
+// 🧠 Algorithms & Visualization
+import { AlgorithmsModule } from './algorithms/algorithms.module';
 import { VisualizationModule } from './visualizations/visualization.module';
 
+// 🧩 Algorithm Builder Modules
+import { BlocksModule } from './algorithms/blocks.module';
+import { TemplatesModule } from './algorithms/templates.module';
 
+// 📝 NEW: Exercises & Submissions
+import { ExercisesModule } from './exercises/exercises.module';
+import { SubmissionsModule } from './submissions/submissions.module';
 
-
+// (Optional — only include if you add metrics tracking later)
+// import { ExecutionMetricsModule } from './algorithms/execution-metrics.module';
 
 @Module({
   imports: [
+    // 🌍 Global .env config
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
+
+    // 🗄 Database
     TypeOrmModule.forRoot({
       type: 'mariadb',
       host: process.env.DB_HOST,
@@ -28,14 +45,27 @@ import { VisualizationModule } from './visualizations/visualization.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-   
+
+    
+    // 🔐 Core App Modules
     AuthModule,
-    ChatgptModule,
     UserModule,
+    ChatgptModule,
+     AiConvoModule,
+
+    // 🧠 Algorithm & Visualization Modules
     AlgorithmsModule,
     VisualizationModule,
-   
-    
+
+    // 🧩 Algorithm Builder Enhancements
+    BlocksModule,
+    TemplatesModule,
+
+    // 📝 NEW: Exercises + Submissions
+    ExercisesModule,
+    SubmissionsModule,
+
+    // ExecutionMetricsModule, // Uncomment when adding metrics
   ],
 })
 export class AppModule {}

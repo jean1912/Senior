@@ -1,15 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToOne,
-  OneToMany,
+  Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn,
+  ManyToOne, OneToMany
 } from 'typeorm';
 import { Users } from '../user/users.entity';
 import { Visualization } from '../visualizations/visualization.entity';
 import { Exercise } from '../exercises/exercise.entity';
+import { AlgorithmBlock } from './algorithm-block.entity';
 
 @Entity('algorithms')
 export class Algorithm {
@@ -27,7 +23,7 @@ export class Algorithm {
   category: string;
 
   @Column({ length: 50 })
-  complexity: string; // e.g. O(n log n)
+  complexity: string;
 
   @Column('text')
   description: string;
@@ -36,16 +32,23 @@ export class Algorithm {
   pseudocode: string;
 
   @Column('text', { nullable: true })
-  code?: string; // Optional JS or pseudocode logic for advanced visualization
+  code?: string;
 
   @Column({ type: 'json', nullable: true })
-  structureSchema?: Record<string, any>; // For data structures (like trees)
+  structureSchema?: Record<string, any>;
 
   @Column({ type: 'json', nullable: true })
-  validationRules?: Record<string, any>; // For validation (e.g., red-black tree rules)
+  validationRules?: Record<string, any>;
 
   @Column({ default: true })
   isPublished: boolean;
+
+  
+  @Column({ type: 'json', nullable: true })
+  visualFlow?: {
+    nodes: Array<{ id: string; label: string; type: string }>;
+    edges: Array<{ id?: string; from: string; to: string }>;
+  };
 
   @CreateDateColumn()
   created_at: Date;
@@ -53,12 +56,15 @@ export class Algorithm {
   @UpdateDateColumn()
   updated_at: Date;
 
-  // Relations
   @ManyToOne(() => Users, { nullable: true, onDelete: 'SET NULL' })
   createdBy?: Users;
 
   @ManyToOne(() => Users, { nullable: true, onDelete: 'SET NULL' })
   lastEditedBy?: Users;
+
+ 
+  @OneToMany(() => AlgorithmBlock, (b) => b.algorithm, { cascade: true })
+  blocks: AlgorithmBlock[];
 
   @OneToMany(() => Visualization, (v) => v.algorithm, { cascade: true })
   visualizations: Visualization[];
